@@ -65,7 +65,8 @@ private:
 		DWORD error;
 	};
 
-	virtual void DoRunLoop();
+    virtual void DoRunLoop();
+    virtual void DoRunLoopOnce();
 	void WaitForWork();
 	bool MatchCompletedIOItem(IOHandler* filter, IOItem* item);
 	bool GetIOItem(DWORD timeout, IOItem* item);

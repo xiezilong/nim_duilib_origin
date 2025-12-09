@@ -109,6 +109,22 @@ void MessageLoop::Run()
 	RunInternal();
 }
 
+bool MessageLoop::RunOnce()
+{
+    assert(this == current());
+    AutoRunState state(this);
+
+#if defined(OS_WIN)
+    if (state_->dispatcher && type() == kUIMessageLoop)
+    {
+        static_cast<WinUIMessagePump*>(pump_.get())->
+            RunOnceWithDispatcher(this, state_->dispatcher);
+        return true;
+    }
+#endif
+    return pump_->RunOnce(this);
+}
+
 void MessageLoop::RunAllPending()
 {
 	assert(this == current());

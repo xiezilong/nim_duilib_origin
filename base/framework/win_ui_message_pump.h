@@ -40,7 +40,8 @@ public:
 private:
 	static LRESULT CALLBACK WndProcThunk(
 	  HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
-	virtual void DoRunLoop();
+    virtual void DoRunLoop();
+    virtual void DoRunLoopOnce();
 	virtual void PreProcessMessage(const MSG& msg);
 	virtual void PostProcessMessage(const MSG& msg);
 	void InitMessageWnd();

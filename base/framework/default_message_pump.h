@@ -18,6 +18,7 @@ public:
 	virtual ~DefaultMessagePump() {}
 
 	virtual void Run(Delegate* delegate);
+    virtual bool RunOnce(Delegate* delegate);
 	virtual void Quit();
 	virtual void ScheduleWork();
 	virtual void ScheduleDelayedWork(const TimeTicks& delay_message_time);

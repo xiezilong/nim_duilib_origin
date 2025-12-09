@@ -5,7 +5,7 @@
 #include <algorithm>
 
 namespace nim_comp {
-
+#if 0
 static const char kModalThreadName[] = "AsyncModalRunner";
 
 AsyncModalRunner::AsyncModalRunner(Delegate *delegate)
@@ -123,5 +123,5 @@ void AsyncModalRunnerManager::Deregister(AsyncModalRunner *runner)
 	// If the runner is found,
 	// it will be destroyed out of the scope of the lock
 }
-
+#endif
 }

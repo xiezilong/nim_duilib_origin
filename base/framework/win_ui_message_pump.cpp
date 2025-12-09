@@ -190,6 +190,51 @@ void WinUIMessagePump::DoRunLoop()
 	}
 }
 
+void WinUIMessagePump::DoRunLoopOnce()
+{
+    do
+    {
+        // If we do any work, we may create more messages etc., and more work may
+        // possibly be waiting in another task group.  When we (for example)
+        // ProcessNextWindowsMessage(), there is a good chance there are still more
+        // messages waiting.  On the other hand, when any of these methods return
+        // having done no work, then it is pretty unlikely that calling them again
+        // quickly will find any work to do.  Finally, if they all say they had no
+        // work, then it is a good time to consider sleeping (waiting) for more
+        // work.
+
+        bool more_work_is_plausible = ProcessNextWindowsMessage();
+        if (state_->should_quit)
+            break;
+
+        more_work_is_plausible |= state_->delegate->DoWork();
+        if (state_->should_quit)
+            break;
+
+        more_work_is_plausible |=
+            state_->delegate->DoDelayedWork(&delayed_work_time_);
+        // If we did not process any delayed work, then we can assume that our
+        // existing WM_TIMER if any will fire when delayed work should run.  We
+        // don't want to disturb that timer if it is already in flight.  However,
+        // if we did do all remaining delayed work, then lets kill the WM_TIMER.
+        if (more_work_is_plausible && delayed_work_time_.is_null())
+            KillTimer(message_hwnd_, reinterpret_cast<UINT_PTR>(this));
+        if (state_->should_quit)
+            break;
+
+        if (more_work_is_plausible)
+            continue;
+
+        more_work_is_plausible = state_->delegate->DoIdleWork();
+        if (state_->should_quit)
+            break;
+
+        if (more_work_is_plausible)
+            continue;
+
+	} while (false);
+}
+
 void WinUIMessagePump::WaitForWork()
 {
 	// Wait until a message is available, up to the time needed by the timer

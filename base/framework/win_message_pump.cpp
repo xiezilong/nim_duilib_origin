@@ -32,6 +32,42 @@ void WinMessagePump::RunWithDispatcher(Delegate* delegate, Dispatcher* dispatche
 	state_ = previous_state;
 }
 
+void WinMessagePump::RunOnceWithDispatcher(Delegate* delegate, Dispatcher* dispatcher)
+{
+
+    RunState rs;
+    rs.delegate = delegate;
+    rs.dispatcher = dispatcher;
+    rs.should_quit = false;
+    rs.run_depth = state_ ? state_->run_depth + 1 : 1;
+
+    RunState* previous_state = state_;
+    state_ = &rs;
+
+    DoRunLoopOnce();
+
+    state_ = previous_state;
+}
+
+bool WinMessagePump::RunOnce(Delegate* delegate)
+{
+	if (state_->should_quit)
+	{
+		return false;
+	}
+    RunState rs;
+    rs.delegate = delegate;
+    rs.dispatcher = nullptr;
+    rs.should_quit = false;
+    rs.run_depth = state_ ? state_->run_depth + 1 : 1;
+
+    RunState* previous_state = state_;
+    state_ = &rs;
+	DoRunLoopOnce();
+    state_ = previous_state;
+    return true;
+}
+
 void WinMessagePump::Quit()
 {
 	assert(state_);

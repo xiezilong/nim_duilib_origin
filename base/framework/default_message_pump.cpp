@@ -64,6 +64,33 @@ void DefaultMessagePump::Run(Delegate* delegate)
 	should_quit_ = false;
 }
 
+bool DefaultMessagePump::RunOnce(Delegate* delegate)
+{
+    do
+    {
+        bool did_work = delegate->DoWork();
+        if (should_quit_)
+            break;
+
+        did_work |= delegate->DoDelayedWork(&delayed_work_time_);
+        if (should_quit_)
+            break;
+
+        if (did_work)
+            continue;
+
+        did_work = delegate->DoIdleWork();
+        if (should_quit_)
+            break;
+
+        if (did_work)
+            continue;
+
+	} while (false);
+
+	return should_quit_;
+}
+
 void DefaultMessagePump::Quit()
 {
 	should_quit_ = true;

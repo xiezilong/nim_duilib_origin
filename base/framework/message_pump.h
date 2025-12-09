@@ -45,6 +45,7 @@ public:
 
 	// 启动消息循环
 	virtual void Run(Delegate* delegate) = 0;
+	virtual bool RunOnce(Delegate* delegate) = 0;
 
 	// 通知退出消息循环
 	virtual void Quit() = 0;

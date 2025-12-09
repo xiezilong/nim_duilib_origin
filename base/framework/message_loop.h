@@ -76,7 +76,8 @@ public:
 	Type type() const { return type_; }
 
 	// 运行MessageLoop
-	void Run();
+    void Run();
+    bool RunOnce();
 #if defined(OS_WIN)
 	void RunWithDispatcher(Dispatcher *dispatcher);
 #endif

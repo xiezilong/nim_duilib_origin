@@ -88,6 +88,45 @@ void WinIOMessagePump::DoRunLoop()
 	}
 }
 
+void WinIOMessagePump::DoRunLoopOnce()
+{
+    do
+    {
+        // If we do any work, we may create more messages etc., and more work may
+        // possibly be waiting in another task group.  When we (for example)
+        // WaitForIOCompletion(), there is a good chance there are still more
+        // messages waiting.  On the other hand, when any of these methods return
+        // having done no work, then it is pretty unlikely that calling them
+        // again quickly will find any work to do.  Finally, if they all say they
+        // had no work, then it is a good time to consider sleeping (waiting) for
+        // more work.
+
+        bool more_work_is_plausible = state_->delegate->DoWork();
+        if (state_->should_quit)
+            break;
+
+        more_work_is_plausible |= WaitForIOCompletion(0, NULL);
+        if (state_->should_quit)
+            break;
+
+        more_work_is_plausible |=
+            state_->delegate->DoDelayedWork(&delayed_work_time_);
+        if (state_->should_quit)
+            break;
+
+        if (more_work_is_plausible)
+            continue;
+
+        more_work_is_plausible = state_->delegate->DoIdleWork();
+        if (state_->should_quit)
+            break;
+
+        if (more_work_is_plausible)
+            continue;
+
+	} while (false);
+}
+
 // Wait until IO completes, up to the time needed by the timer manager to fire
 // the next set of timers.
 void WinIOMessagePump::WaitForWork()

@@ -19,7 +19,7 @@
 #define NIM_WIN_GUI_MSG_BOX_ASYNC_MODAL_RUNNER_H_
 
 #include "modal_wnd_base.h"
-
+#if 0
 namespace nim_comp {
 
 class AsyncModalRunner : protected nbase::Thread
@@ -78,5 +78,5 @@ private:
 };
 
 }
-
+#endif
 #endif //NIM_WIN_GUI_MSG_BOX_ASYNC_MODAL_RUNNER_H_
