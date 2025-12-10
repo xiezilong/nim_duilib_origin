@@ -24,6 +24,13 @@ WinUIMessagePump::WinUIMessagePump()
 	InitMessageWnd();
 }
 
+WinUIMessagePump::WinUIMessagePump(std::function<void()> custom_runner)
+	: custom_runner_(custom_runner)
+{
+    InitMessageWnd();
+}
+
+
 WinUIMessagePump::~WinUIMessagePump()
 {
 	::DestroyWindow(message_hwnd_);
@@ -156,6 +163,11 @@ void WinUIMessagePump::DoRunLoop()
 		// quickly will find any work to do.  Finally, if they all say they had no
 		// work, then it is a good time to consider sleeping (waiting) for more
 		// work.
+
+		if (custom_runner_)
+		{
+			custom_runner_();
+		}
 
 		bool more_work_is_plausible = ProcessNextWindowsMessage();
 		if (state_->should_quit)

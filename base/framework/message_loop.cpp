@@ -37,6 +37,28 @@ MessageLoop::MessageLoop()
 	message_loop_proxy_->target_message_loop_ = this;
 }
 
+MessageLoop::MessageLoop(std::function<void()> custom_runner)
+    : type_(kDefaultMessageLoop),
+    state_(NULL),
+#if defined(OS_WIN)
+    os_modal_loop_(false),
+#endif // OS_WIN
+    nestable_tasks_allowed_(true),
+    next_delayed_task_sequence_num_(0),
+	custom_runner_(custom_runner)
+{
+    // 一个线程内不能存在两个或以上MessageLoop
+    assert(g_lazy_ptr.Pointer()->Get() == NULL);
+    // 默认消息循环
+    if (type_ == kDefaultMessageLoop)
+        pump_.reset(new DefaultMessagePump);
+    g_lazy_ptr.Pointer()->Set(this);
+
+    message_loop_proxy_.reset(new MessageLoopProxy, &MessageLoopProxyTraits::Destruct);
+    message_loop_proxy_->target_message_loop_ = this;
+}
+
+
 MessageLoop::~MessageLoop()
 {
 	bool has_work = false;
@@ -526,6 +548,12 @@ UIMessageLoop::UIMessageLoop()
 {
 	pump_.reset(new UIMessagePump);
 	type_ = kUIMessageLoop;
+}
+UIMessageLoop::UIMessageLoop(std::function<void()> custom_runner)
+	: MessageLoop(custom_runner)
+{
+    pump_.reset(new UIMessagePump(custom_runner));
+    type_ = kUIMessageLoop;
 }
 
 void UIMessageLoop::AddUIObserver(UIObserver* observer)

@@ -38,6 +38,15 @@ FrameworkThread::~FrameworkThread()
 	Stop();
 }
 
+void FrameworkThread::SetCustomTaskRunner(std::function<void()> runner)
+{
+	custom_runner_ = runner;
+}
+void FrameworkThread::RemoveCustomTaskRunner()
+{
+	custom_runner_ = nullptr;
+}
+
 bool FrameworkThread::Start()
 {
 	return StartWithLoop(MessageLoop::kDefaultMessageLoop);
@@ -160,7 +169,7 @@ void FrameworkThread::Run()
 				message_loop = new IOMessageLoop;
 #if defined(OS_WIN)
 			else if (loop_type_ == MessageLoop::kUIMessageLoop)
-				message_loop = new UIMessageLoop;
+				message_loop = new UIMessageLoop(custom_runner_);
 #endif
 			else
 				message_loop = new MessageLoop;

@@ -59,6 +59,7 @@ public:
 	};
 
 	explicit MessageLoop();
+	MessageLoop(std::function<void()> custom_runner);
 	virtual ~MessageLoop();
 	static MessageLoop* current();
 
@@ -301,6 +302,8 @@ protected:
 	// The message loop proxy associated with this message loop, if one exists.
 	std::shared_ptr<MessageLoopProxy> message_loop_proxy_;
 
+	std::function<void()> custom_runner_;
+
 	DISALLOW_COPY_AND_ASSIGN(MessageLoop);
 };
 
@@ -317,6 +320,7 @@ public:
 #endif
 
 	UIMessageLoop();
+	UIMessageLoop(std::function<void()> custom_runner);
 
 	static UIMessageLoop* current()
 	{

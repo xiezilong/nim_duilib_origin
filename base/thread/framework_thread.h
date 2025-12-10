@@ -7,6 +7,7 @@
 #include "thread_local.h"
 #include "base/framework/message_loop.h"
 #include "base/synchronization/waitable_event.h"
+#include <memory>
 
 namespace nbase
 {
@@ -53,6 +54,9 @@ public:
 	explicit FrameworkThread(const char* name);
 
 	virtual ~FrameworkThread();
+
+	void SetCustomTaskRunner(std::function<void()> runner);
+	void RemoveCustomTaskRunner();
 
 	// Starts the thread.  Returns true if the thread was successfully started;
 	// otherwise, returns false.  Upon successful return, the message_loop()
@@ -200,6 +204,8 @@ private:
 
 	// The name of the thread.  Used for debugging purposes.
 	std::string name_;
+
+	std::function<void() > custom_runner_;
 };
 
 }

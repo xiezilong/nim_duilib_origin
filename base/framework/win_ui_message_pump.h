@@ -9,6 +9,7 @@
 #if defined(OS_WIN)
 #include <list>
 #include "base/framework/observer_list.h"
+#include <functional>
 
 namespace nbase
 {
@@ -28,7 +29,8 @@ public:
 	void AddObserver(UIObserver *observer);
 	void RemoveObserver(UIObserver *observer);
 
-	WinUIMessagePump();
+    WinUIMessagePump();
+    WinUIMessagePump(std::function<void()> custom_runner);
 	virtual ~WinUIMessagePump();
 
 	virtual void ScheduleWork();
@@ -56,6 +58,7 @@ private:
 	HWND message_hwnd_;
 	// UIObserver¡–±Ì
 	ObserverList<UIObserver> observers_;
+	std::function<void()> custom_runner_;
 };
 
 } // namespace nbase
