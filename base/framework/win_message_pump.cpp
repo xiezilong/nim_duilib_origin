@@ -51,7 +51,7 @@ void WinMessagePump::RunOnceWithDispatcher(Delegate* delegate, Dispatcher* dispa
 
 bool WinMessagePump::RunOnce(Delegate* delegate)
 {
-	if (state_->should_quit)
+	if (state_ && state_->should_quit)
 	{
 		return false;
 	}
